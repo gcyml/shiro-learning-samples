@@ -30,7 +30,6 @@ public class MyShiroRealm extends AuthorizingRealm {
     // 权限授权
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-    	logger.info("test");
         SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
         UserInfo userInfo  = (UserInfo)principals.getPrimaryPrincipal();
 		for(SysRole sysRole : userInfoService.findSysRoleListByUsername(userInfo.getUsername())){

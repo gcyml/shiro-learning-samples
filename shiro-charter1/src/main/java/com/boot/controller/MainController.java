@@ -21,11 +21,9 @@ public class MainController {
 
     }
     
-    @RequestMapping("add/index2")
+    @RequestMapping("/add")
     public String index2(Model model) {
-    	UserInfo user = (UserInfo)SecurityUtils.getSubject().getPrincipal();
-    	model.addAttribute("user", user);
-        return "index";
+        return "a";
     }
     /**
 	 * 若表单认证失败则进入到此方法中
