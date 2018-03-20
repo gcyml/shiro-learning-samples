@@ -5,6 +5,7 @@ package com.boot.shiro.filter;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
@@ -35,16 +36,23 @@ public class CaptchaValidateFilter extends AccessControlFilter {
 	    //页面输入的验证码
 	    String captchaCode = getCaptchaCode(request);
 	    String validateCode = (String)session.getAttribute(Constants.KAPTCHA_SESSION_KEY);
-
+	    
+	    HttpServletRequest httpServletRequest = WebUtils.toHttp(request);  
+	    //判断验证码是否表单提交（允许访问）  
+        if ( !"post".equalsIgnoreCase(httpServletRequest.getMethod())) {  
+            return true;  
+        } 
+        
+        // 若验证码为空或匹配失败则返回false
 	    if(captchaCode == null) {
 	    	return false;
-	      } else if (validateCode != null) {
-	    	  captchaCode = captchaCode.toLowerCase();
-	    	  validateCode = validateCode.toLowerCase();
-	          if (!captchaCode.equals(validateCode)) {
-	              return false;
-	          }
-	      }
+	    } else if (validateCode != null) {
+	    	captchaCode = captchaCode.toLowerCase();
+	    	validateCode = validateCode.toLowerCase();
+	        if(!captchaCode.equals(validateCode)) {
+	        	return false;
+	        }
+	    }
 	    return true;
 	}
 

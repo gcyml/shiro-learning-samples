@@ -5,9 +5,15 @@ import java.util.Map;
 
 import javax.servlet.Filter;
 
+import org.apache.shiro.cache.ehcache.EhCacheManager;
+import org.apache.shiro.codec.Base64;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.session.mgt.ExecutorServiceSessionValidationScheduler;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
+import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.apache.shiro.web.servlet.SimpleCookie;
+import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -51,12 +57,12 @@ public class ShiroConfig {
         //配置退出 过滤器,其中的具体的退出代码Shiro已经替我们实现了
         filterChainDefinitionMap.put("/logout", "logout");
         //<!-- 过滤链定义，从上向下顺序执行，一般将/**放在最为下边 -->:这是一个坑呢，一不小心代码就不好使了;
-        //<!-- authc:所有url都必须认证通过才可以访问; anon:所有url都都可以匿名访问-->
-
+        //<!-- authc:所有url都必须认证通过才可以访问; anon:所有url都都可以匿名访问; user”表示访问该地址的用户是身份验证通过或RememberMe登录的都可以-->
         filterChainDefinitionMap.put("/add", "perms[add]");
         filterChainDefinitionMap.put("/delete", "roles[admin]");
         filterChainDefinitionMap.put("/login", "captchaVaildate,authc");
-        filterChainDefinitionMap.put("/**", "authc");
+
+        filterChainDefinitionMap.put("/**", "user");
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
         
 
@@ -92,9 +98,110 @@ public class ShiroConfig {
      */
     @Bean
     public SecurityManager securityManager(){
-        DefaultWebSecurityManager securityManager =  new DefaultWebSecurityManager();
+        DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         securityManager.setRealm(myShiroRealm());
+        
+        //注入记住我管理器
+        securityManager.setRememberMeManager(rememberMeManager());
+        //注入ehCache管理器
+        securityManager.setCacheManager(ehCacheManager());
+        // 注入session管理器, 不注入session管理器, 默认30分钟
+        securityManager.setSessionManager(configWebSessionManager());
         return securityManager;
+    }
+    
+    ///////////////////////////////////////////////////////////////////////
+    
+    /**
+     * cookie对象;
+     * rememberMeCookie()方法是设置Cookie的生成模版，比如cookie的name，cookie的有效时间等等。
+     * @return rememberMeCookie
+     */
+    @Bean
+    public SimpleCookie rememberMeCookie(){
+        //这个参数是cookie的名称，对应前端的checkbox的name = rememberMe
+        SimpleCookie simpleCookie = new SimpleCookie("rememberMe");
+        //<!-- 记住我cookie生效时间30天 ,单位秒;-->
+        simpleCookie.setMaxAge(30*24*60*60);
+        return simpleCookie;
+    }
+    
+    /**
+     * cookie管理对象;
+     * rememberMeManager()方法是生成rememberMe管理器，而且要将这个rememberMe管理器设置到securityManager中
+     * @return rememberMeManager
+     */
+    @Bean
+    public CookieRememberMeManager rememberMeManager(){
+        CookieRememberMeManager cookieRememberMeManager = new CookieRememberMeManager();
+        cookieRememberMeManager.setCookie(rememberMeCookie());
+        //rememberMe cookie加密的密钥 建议每个项目都不一样 默认AES算法 密钥长度(128 256 512 位)
+        cookieRememberMeManager.setCipherKey(Base64.decode("3AvVhmFLUs0KTA3Kprsdag=="));
+        return cookieRememberMeManager;
+    }
+    
+    /**
+     * 缓存管理器
+     * @return cacheManager
+     */
+    @Bean
+    public EhCacheManager ehCacheManager(){
+        EhCacheManager cacheManager = new EhCacheManager();
+        cacheManager.setCacheManagerConfigFile("classpath:config/ehcache-shiro.xml");
+        return cacheManager;
+    }
+    
+    ///////////////////////////////////////////////////////////////////////////////////////
+    // session相关配置
+    //////////////////////////////////////////////////////////////////////////////////////
+    /**
+     * 会话管理器
+     * @return sessionManager
+     */
+    @Bean
+    public DefaultWebSessionManager configWebSessionManager(){
+        DefaultWebSessionManager manager = new DefaultWebSessionManager();
+        // 加入缓存管理器
+        manager.setCacheManager(ehCacheManager());
+        // 删除过期的session
+        manager.setDeleteInvalidSessions(true);
+        
+        // 设置全局session超时时间
+        manager.setGlobalSessionTimeout(1 * 60 *1000);
+        
+        // 是否定时检查session
+        manager.setSessionValidationSchedulerEnabled(true);
+        manager.setSessionValidationScheduler(configSessionValidationScheduler());
+        manager.setSessionIdUrlRewritingEnabled(false);
+        manager.setSessionIdCookieEnabled(true);
+        manager.setSessionIdCookie(sessionIdCookie());
+        return manager;
+    }
+    
+    /**
+     * session会话验证调度器
+     * @return session会话验证调度器
+     */
+    @Bean 
+    public ExecutorServiceSessionValidationScheduler configSessionValidationScheduler() {
+    	ExecutorServiceSessionValidationScheduler sessionValidationScheduler = new ExecutorServiceSessionValidationScheduler();
+    	//设置session的失效扫描间隔，单位为毫秒
+    	sessionValidationScheduler.setInterval(300*1000);
+    	return sessionValidationScheduler;
+    }
+    
+    /**
+     * 会话Cookie模板
+     * @return cookie
+     */
+    @Bean
+    public SimpleCookie sessionIdCookie(){
+        //这个参数是cookie的名称，对应前端的checkbox的name = rememberMe
+        SimpleCookie simpleCookie = new SimpleCookie("sid");
+        simpleCookie.setHttpOnly(true);
+        // 无限期
+        simpleCookie.setMaxAge(-1);
+        return simpleCookie;
     }
 
 }

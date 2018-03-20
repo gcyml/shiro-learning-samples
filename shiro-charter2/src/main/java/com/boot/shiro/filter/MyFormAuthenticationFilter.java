@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
  * @author wgc
  */
 public class MyFormAuthenticationFilter extends FormAuthenticationFilter{
-    private String ERROR_REASON = "errorReason";
 	private static final Logger logger = LoggerFactory.getLogger(MyFormAuthenticationFilter.class);
 	/**
 	 * 重写该方法, 判断返回登录信息
@@ -46,8 +45,7 @@ public class MyFormAuthenticationFilter extends FormAuthenticationFilter{
         } else{
         	message = className;
         }
-        request.setAttribute(getFailureKeyAttribute(), className);
-        request.setAttribute(ERROR_REASON, message);
+        request.setAttribute(getFailureKeyAttribute(), message);
     }
     
     /**
@@ -56,7 +54,6 @@ public class MyFormAuthenticationFilter extends FormAuthenticationFilter{
     @Override
     protected boolean onAccessDenied(ServletRequest request, ServletResponse response, Object map) throws Exception {
     	if(request.getAttribute(getFailureKeyAttribute()) != null) {  
-    		request.setAttribute(ERROR_REASON, "验证码错误");
             return true;  
         }  
         return super.onAccessDenied(request, response, map);
