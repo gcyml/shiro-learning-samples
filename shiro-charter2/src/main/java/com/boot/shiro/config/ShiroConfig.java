@@ -11,6 +11,7 @@ import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.boot.shiro.filter.CaptchaValidateFilter;
 import com.boot.shiro.filter.MyFormAuthenticationFilter;
 import com.boot.shiro.realm.MyShiroRealm;
 
@@ -40,7 +41,6 @@ public class ShiroConfig {
         Map<String,String> filterChainDefinitionMap = new LinkedHashMap<>();
         // 配置不会被拦截的链接 顺序判断
 
-        filterChainDefinitionMap.put("/assets/**", "anon");
         filterChainDefinitionMap.put("/css/**", "anon");
         filterChainDefinitionMap.put("/js/**", "anon");
         filterChainDefinitionMap.put("/img/**", "anon");
@@ -52,9 +52,10 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/logout", "logout");
         //<!-- 过滤链定义，从上向下顺序执行，一般将/**放在最为下边 -->:这是一个坑呢，一不小心代码就不好使了;
         //<!-- authc:所有url都必须认证通过才可以访问; anon:所有url都都可以匿名访问-->
-//        filterChainDefinitionMap.put("/", "user"); 
+
         filterChainDefinitionMap.put("/add", "perms[add]");
         filterChainDefinitionMap.put("/delete", "roles[admin]");
+        filterChainDefinitionMap.put("/login", "captchaVaildate,authc");
         filterChainDefinitionMap.put("/**", "authc");
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
         
@@ -69,6 +70,7 @@ public class ShiroConfig {
 
         //自定义拦截器
         Map<String, Filter> filters = shiroFilterFactoryBean.getFilters();
+        filters.put("captchaVaildate", new CaptchaValidateFilter());
         filters.put("authc", new MyFormAuthenticationFilter());
         return shiroFilterFactoryBean;
     }

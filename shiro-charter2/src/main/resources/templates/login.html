@@ -24,9 +24,10 @@
 			<input class="layui-input" name="password" placeholder="密码" lay-verify="pass" type="password" autocomplete="off"/>
 		</div>
 		<div class="layui-form-item form_code">
-			<input class="layui-input"  name="code" placeholder="验证码" lay-verify="required" type="text" autocomplete="off"/>
-			<div class="code">
-				<img type="image" src="../captcha/kaptcha.jpg" id="codeImage" onclick="chageCode()" title="图片看不清？点击重新得到验证码" style="cursor:pointer;" width="116" height="36"/></div>
+			<input class="layui-input"  name="captchaCode" placeholder="验证码" lay-verify="required" type="text" autocomplete="off"/>
+			<div>
+				<img type="image" src="../captcha/kaptcha.jpg" id="codeImage" onclick="chageCode()" title="图片看不清？点击重新得到验证码" style="cursor:pointer;" width="116" height="36"/>
+			</div>
 		</div>
 		<div class="layui-form-item">
 			<input type="checkbox" name="rememberMe" title="记住我" lay-skin="primary"/>
