@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
  * @author wgc
  */
 public class MyFormAuthenticationFilter extends FormAuthenticationFilter{
-    public static final String ERROR_REASON = "errorReason";
 	private static final Logger logger = LoggerFactory.getLogger(MyFormAuthenticationFilter.class);
 	/**
 	 * 重写该方法, 判断返回登录信息
@@ -45,7 +44,6 @@ public class MyFormAuthenticationFilter extends FormAuthenticationFilter{
         } else{
         	message = className;
         }
-        request.setAttribute(getFailureKeyAttribute(), className);
-        request.setAttribute(ERROR_REASON, message);
+        request.setAttribute(getFailureKeyAttribute(), message);
     }
 }

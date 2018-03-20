@@ -29,22 +29,22 @@
 <script type="text/javascript" src="../layui/layui.js"></script>
 
 <script th:inline="javascript">
-    layui.use(['layer'], function(){
-        var layer = layui.layer;
-        var message = [[${errorReason}]]?[[${errorReason}]]:getUrlPara("errorReason");
-        if(message) {
-        	layer.msg(message);
-        }        	
-    });
-    function getUrlPara(name)
-    {
-        var url = document.location.toString();
-        var arrUrl = url.split("?"+name +"=");
-        var para = arrUrl[1];
-        console.log(para);
-        if(para)
-        	return decodeURI(para);
-    }
+layui.use(['layer'], function(){
+    var layer = layui.layer;
+    var message = [[${shiroLoginFailure}]]?[[${shiroLoginFailure}]]:getUrlPara("shiroLoginFailure");
+    if(message) {
+    	layer.msg(message);
+    }        	
+});
+function getUrlPara(name)
+{
+    var url = document.location.toString();
+    var arrUrl = url.split("?"+name +"=");
+    var para = arrUrl[1];
+    console.log(para);
+    if(para)
+    	return decodeURI(para);
+}
 </script>
 <script>
 layui.use(['form'], function(){
