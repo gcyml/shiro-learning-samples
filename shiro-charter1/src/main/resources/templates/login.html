@@ -3,14 +3,7 @@
 <head>
 	<meta charset="utf-8"/>
 	<title>登录--layui后台管理模板</title>
-	<meta name="renderer" content="webkit"/>
-	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-	<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
-	<meta name="apple-mobile-web-app-capable" content="yes"/>
-	<meta name="format-detection" content="telephone=no"/>
 	<link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
-
 	<link rel="stylesheet" href="../css/login.css" media="all" />
 </head>
 <body>
@@ -18,10 +11,10 @@
 	<h1>layuiCMS-管理登录</h1>
 	<form class="layui-form" method="post">
 		<div class="layui-form-item">
-			<input class="layui-input" name="username" placeholder="用户名" lay-verify="username" type="text" autocomplete="off"/>
+			<input class="layui-input" name="username" placeholder="用户名" type="text" autocomplete="off"/>
 		</div>
 		<div class="layui-form-item">
-			<input class="layui-input" name="password" placeholder="密码" lay-verify="pass" type="password" autocomplete="off"/>
+			<input class="layui-input" name="password" placeholder="密码" type="password" autocomplete="off"/>
 		</div>
 		<button class="layui-btn login_btn" lay-submit="" lay-filter="login">登录</button>
 	</form>
@@ -41,20 +34,9 @@ function getUrlPara(name)
     var url = document.location.toString();
     var arrUrl = url.split("?"+name +"=");
     var para = arrUrl[1];
-    console.log(para);
     if(para)
     	return decodeURI(para);
 }
-</script>
-<script>
-layui.use(['form'], function(){
-	var form = layui.form;
-    // 自定义验证表单器
-    form.verify({
-    	username: [/^[a-zA-Z0-9]*$/g, '用户名只能为英文字母及数字组成'],
-    	pass: [/^[\S]{6,12}$/, '密码必须6到12位，且不能出现空格'] 
-    	});   	
-});
 </script>
 </body>
 </html>

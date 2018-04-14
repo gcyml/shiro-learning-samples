@@ -20,11 +20,7 @@ public class MainController {
         return "index";
 
     }
-    
-    @RequestMapping("/add")
-    public String index2(Model model) {
-        return "a";
-    }
+
     /**
 	 * 若表单认证失败则进入到此方法中
 	 */
