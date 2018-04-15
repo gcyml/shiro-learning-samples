@@ -9,7 +9,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/shiro?characterEncoding=UTF-8&useSSL=true
     username: root
-    password: cqits123  
+    password: Cqits123
 mybatis-plus:
   mapper-locations: classpath:/com/boot/mapper/*.xml
   typeAliasesPackage: com.boot.domain

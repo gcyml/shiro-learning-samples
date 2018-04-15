@@ -106,10 +106,10 @@ public class ShiroConfig {
         
         //注入记住我管理器
         securityManager.setRememberMeManager(rememberMeManager());
-        //注入ehCache管理器
-        securityManager.setCacheManager(ehCacheManager());
-        // 注入session管理器, 不注入session管理器, 默认30分钟
-        securityManager.setSessionManager(configWebSessionManager());
+//        //注入ehCache管理器
+//        securityManager.setCacheManager(ehCacheManager());
+//        // 注入session管理器, 不注入session管理器, 默认30分钟
+//        securityManager.setSessionManager(configWebSessionManager());
         return securityManager;
     }
     
@@ -126,6 +126,7 @@ public class ShiroConfig {
         SimpleCookie simpleCookie = new SimpleCookie("rememberMe");
         //<!-- 记住我cookie生效时间30天 ,单位秒;-->
         simpleCookie.setMaxAge(30*24*60*60);
+        simpleCookie.setHttpOnly(true);
         return simpleCookie;
     }
     
@@ -153,7 +154,7 @@ public class ShiroConfig {
         cacheManager.setCacheManagerConfigFile("classpath:config/ehcache-shiro.xml");
         return cacheManager;
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////////////////
     // session相关配置
     //////////////////////////////////////////////////////////////////////////////////////
@@ -168,46 +169,30 @@ public class ShiroConfig {
         manager.setCacheManager(ehCacheManager());
         // 删除过期的session
         manager.setDeleteInvalidSessions(true);
-        
+
         // 设置全局session超时时间
         manager.setGlobalSessionTimeout(1 * 60 *1000);
-        
+
         // 是否定时检查session
         manager.setSessionValidationSchedulerEnabled(true);
         manager.setSessionValidationScheduler(configSessionValidationScheduler());
         manager.setSessionIdUrlRewritingEnabled(false);
         manager.setSessionIdCookieEnabled(true);
-        manager.setSessionIdCookie(sessionIdCookie());
         return manager;
     }
-    
+
     /**
      * session会话验证调度器
      * @return session会话验证调度器
      */
-    @Bean 
+    @Bean
     public ExecutorServiceSessionValidationScheduler configSessionValidationScheduler() {
     	ExecutorServiceSessionValidationScheduler sessionValidationScheduler = new ExecutorServiceSessionValidationScheduler();
     	//设置session的失效扫描间隔，单位为毫秒
     	sessionValidationScheduler.setInterval(300*1000);
     	return sessionValidationScheduler;
     }
-    
-    /**
-     * 会话Cookie模板
-     * @return cookie
-     */
-    @Bean
-    public SimpleCookie sessionIdCookie(){
-        //这个参数是cookie的名称，对应前端的checkbox的name = rememberMe
-        SimpleCookie simpleCookie = new SimpleCookie("sid");
-        simpleCookie.setHttpOnly(true);
-        // 无限期
-        simpleCookie.setMaxAge(-1);
-        return simpleCookie;
-    }
-    
-    
+
     //////////////////////////////////////////////////////////////////////////////////////////
     /**
      * 限制登录次数
@@ -216,11 +201,12 @@ public class ShiroConfig {
     @Bean
     public CredentialsMatcher retryLimitCredentialsMatcher() {
         RetryLimitCredentialsMatcher retryLimitCredentialsMatcher = new RetryLimitCredentialsMatcher(ehCacheManager());
+        // 设置限制
         retryLimitCredentialsMatcher.setMaxRetryNum(5);
         return retryLimitCredentialsMatcher;
 
     }
-    
+
     /////////////////////////////////////////////////////////////////////////////////////////
     /**
      * 限制同一账号登录同时登录人数控制
@@ -239,7 +225,7 @@ public class ShiroConfig {
         kickoutSessionControlFilter.setKickoutAfter(false);
         //同一个用户最大的会话数，默认1；比如2的意思是同一个用户允许最多同时两个人登录；
         kickoutSessionControlFilter.setMaxSession(1);
-        
+
         //被踢出后重定向到的地址；
         kickoutSessionControlFilter.setKickoutUrl("/login");
         return kickoutSessionControlFilter;

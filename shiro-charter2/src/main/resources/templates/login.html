@@ -34,7 +34,7 @@
 
 <script th:inline="javascript">
 
-layui.use(['layer'], function(){
+layui.use(['layer','form'], function(){
     var layer = layui.layer;
     var message = [[${shiroLoginFailure}]]?[[${shiroLoginFailure}]]:getUrlPara("shiroLoginFailure");
     if(message) {
