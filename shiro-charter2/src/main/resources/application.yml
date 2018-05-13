@@ -37,3 +37,10 @@ mybatis-plus:
     cache-enabled: false
     #配置JdbcTypeForNull
     jdbc-type-for-null: 'null'
+shiro:
+  loginUrl: /login
+  successUrl: /index
+  unauthorizedUrl: /403
+#  rememberMeManager:
+#    cookie:
+#      maxAge: 360000

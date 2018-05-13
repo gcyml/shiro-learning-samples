@@ -1,22 +1,27 @@
 package com.boot.shiro.config;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import javax.servlet.Filter;
-
-import org.apache.shiro.codec.Base64;
-import org.apache.shiro.mgt.SecurityManager;
-import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
-import org.apache.shiro.web.mgt.CookieRememberMeManager;
-import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
-import org.apache.shiro.web.servlet.SimpleCookie;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 import com.boot.shiro.filter.CaptchaValidateFilter;
 import com.boot.shiro.filter.MyFormAuthenticationFilter;
 import com.boot.shiro.realm.MyShiroRealm;
+import org.apache.shiro.codec.Base64;
+import org.apache.shiro.realm.Realm;
+import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
+import org.apache.shiro.spring.web.config.DefaultShiroFilterChainDefinition;
+import org.apache.shiro.spring.web.config.ShiroFilterChainDefinition;
+import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
+import org.apache.shiro.web.mgt.CookieRememberMeManager;
+import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.apache.shiro.web.servlet.ShiroFilter;
+import org.apache.shiro.web.servlet.SimpleCookie;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import javax.servlet.Filter;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+
 
 /**
  * @author wgc
@@ -24,6 +29,38 @@ import com.boot.shiro.realm.MyShiroRealm;
  */
 @Configuration
 public class ShiroConfig {
+//    @Bean(name = "captchaVaildate")
+//    public CaptchaValidateFilter captchaValidateFilter() {
+//        CaptchaValidateFilter captchaValidateFilter = new CaptchaValidateFilter();
+////        captchaValidateFilter.setName("captchaVaildate");
+//        return captchaValidateFilter;
+//    }
+    @Bean
+    public ShiroFilterChainDefinition shiroFilterChainDefinition() {
+        DefaultShiroFilterChainDefinition chainDefinition = new DefaultShiroFilterChainDefinition();
+        //拦截器.
+//        Map<String,String> filterChainDefinitionMap = new LinkedHashMap<>();
+//        // 配置不会被拦截的链接 顺序判断
+//
+//        filterChainDefinitionMap.put("/css/**", "anon");
+//        filterChainDefinitionMap.put("/js/**", "anon");
+//        filterChainDefinitionMap.put("/img/**", "anon");
+//        filterChainDefinitionMap.put("/layui/**", "anon");
+//        filterChainDefinitionMap.put("/captcha/**", "anon");
+//        filterChainDefinitionMap.put("/favicon.ico", "anon");
+//
+//        //配置退出 过滤器,其中的具体的退出代码Shiro已经替我们实现了
+//        filterChainDefinitionMap.put("/logout", "logout");
+//        //<!-- 过滤链定义，从上向下顺序执行，一般将/**放在最为下边 -->:这是一个坑呢，一不小心代码就不好使了;
+//        //<!-- authc:所有url都必须认证通过才可以访问; anon:所有url都都可以匿名访问; user”表示访问该地址的用户是身份验证通过或RememberMe登录的都可以-->
+//        filterChainDefinitionMap.put("/add", "perms[add]");
+//        filterChainDefinitionMap.put("/login", "captchaVaildate,authc");
+//
+//        filterChainDefinitionMap.put("/**", "user");
+//        chainDefinition.addPathDefinitions(filterChainDefinitionMap);
+        return chainDefinition;
+    }
+
     /**
      * ShiroFilterFactoryBean 处理拦截资源文件问题。
      * 注意：单独一个ShiroFilterFactoryBean配置是或报错的，以为在
@@ -36,7 +73,7 @@ public class ShiroConfig {
      *
      */
     @Bean
-    public ShiroFilterFactoryBean shirFilter(SecurityManager securityManager) {
+    public ShiroFilterFactoryBean shirFilter(DefaultWebSecurityManager securityManager) {
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
         shiroFilterFactoryBean.setSecurityManager(securityManager);
 
@@ -60,7 +97,7 @@ public class ShiroConfig {
 
         filterChainDefinitionMap.put("/**", "user");
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
-        
+
 
         // 如果不设置默认会自动寻找Web工程根目录下的"/login.jsp"页面
         shiroFilterFactoryBean.setLoginUrl("/login");
@@ -83,17 +120,35 @@ public class ShiroConfig {
 	 * @return myShiroRealm
 	 */
     @Bean
-    public MyShiroRealm myShiroRealm(){
+    public Realm myShiroRealm(){
         MyShiroRealm myShiroRealm = new MyShiroRealm();
         return myShiroRealm;
     }
+
+    @Bean
+    public FormAuthenticationFilter formAuthenticationFilter() {
+        MyFormAuthenticationFilter formAuthenticationFilter = new MyFormAuthenticationFilter();
+        return formAuthenticationFilter;
+    }
+
+//    @Bean
+//    public ShiroFilter a() {
+//        ShiroFilter a = new ShiroFilter();
+//        a.setName("captchaVaildate");
+//        ShiroFilterChainDefinition registrationBean = new SFilterRegistrationBean();
+//        registrationBean.setFilter(new CaptchaValidateFilter());
+//        registrationBean.setName("captchaVaildate");
+//        return registrationBean;
+//    }
+
+
 
     /**
      * 安全管理器
      * @return securityManager
      */
     @Bean
-    public SecurityManager securityManager(){
+    public DefaultWebSecurityManager securityManager(){
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         securityManager.setRealm(myShiroRealm());
         
