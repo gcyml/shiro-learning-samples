@@ -107,9 +107,9 @@ public class ShiroConfig {
         //注入记住我管理器
         securityManager.setRememberMeManager(rememberMeManager());
 //        //注入ehCache管理器
-//        securityManager.setCacheManager(ehCacheManager());
-//        // 注入session管理器, 不注入session管理器, 默认30分钟
-//        securityManager.setSessionManager(configWebSessionManager());
+        securityManager.setCacheManager(ehCacheManager());
+        // 注入session管理器, 不注入session管理器, 默认30分钟
+        securityManager.setSessionManager(configWebSessionManager());
         return securityManager;
     }
     
